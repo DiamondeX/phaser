@@ -8,9 +8,8 @@ var GetColor = require('./GetColor');
 
 /**
  * Converts an HSV (hue, saturation and value) color value to RGB.
- * Conversion formula from http://en.wikipedia.org/wiki/HSL_color_space.
+ * Conversion formula from https://en.wikipedia.org/wiki/HSL_and_HSV.
  * Assumes HSV values are contained in the set [0, 1].
- * Based on code by Michael Jackson (https://github.com/mjijackson)
  *
  * @function Phaser.Display.Color.HSVToRGB
  * @since 3.0.0
@@ -27,51 +26,15 @@ var HSVToRGB = function (h, s, v, out)
     if (s === undefined) { s = 1; }
     if (v === undefined) { v = 1; }
 
-    var i = Math.floor(h * 6);
-    var f = h * 6 - i;
+    function f (n) => {
+        var k = (n + h * 6) % 6;
+        var min = Math.min(k, 4 - k, 1);
+        return Math.round(255 * (v - v * s * Math.max(0, min)));
+    };
 
-    var p = Math.floor((v * (1 - s)) * 255);
-    var q = Math.floor((v * (1 - f * s)) * 255);
-    var t = Math.floor((v * (1 - (1 - f) * s)) * 255);
-
-    v = Math.floor(v *= 255);
-
-    var r = v;
-    var g = v;
-    var b = v;
-
-    var c = i % 6;
-
-    if (c === 0)
-    {
-        g = t;
-        b = p;
-    }
-    else if (c === 1)
-    {
-        r = q;
-        b = p;
-    }
-    else if (c === 2)
-    {
-        r = p;
-        b = t;
-    }
-    else if (c === 3)
-    {
-        r = p;
-        g = q;
-    }
-    else if (c === 4)
-    {
-        r = t;
-        g = p;
-    }
-    else if (c === 5)
-    {
-        g = p;
-        b = q;
-    }
+    var r = f(5);
+    var g = f(3);
+    var b = f(1);
 
     if (!out)
     {
